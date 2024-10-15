@@ -83,5 +83,14 @@ public class PlayerInteractListener implements Listener {
 
         ChatUtils.chat(player, "<green>Clicked a present!");
         giftPlayer.findGift(event.getClickedBlock());
+
+        // Process rewards, if applicable.
+        if(plugin.getGiftManager().hasReward(giftPlayer.getFoundGifts())) {
+            // TODO: Preface strings with "command:" or "message:" to change reward type.
+            // allows for broadcasting rewards.\ to the player.
+            for(final String command : plugin.getGiftManager().getReward(giftPlayer.getFoundGifts())) {
+                plugin.getServer().getConsoleSender().sendMessage(command.replace("%player%", player.getName()));
+            }
+        }
     }
 }
