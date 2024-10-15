@@ -1,0 +1,10 @@
+name: GiftHunt
+version: '${project.version}'
+main: net.jadedmc.gifthunt.GiftHuntPlugin
+api-version: '1.13'
+
+commands:
+  gifthunt:
+    description: Gifthunt command.
+    permission: gifthunt.admin
+    aliases: [gh, gifts, presents]

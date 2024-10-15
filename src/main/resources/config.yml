@@ -1,0 +1,9 @@
+database:
+ host: localhost
+ port: 3306
+ database: db
+ username: username
+ password: password
+
+rewards:
+   1: "eco give %player% 100"
