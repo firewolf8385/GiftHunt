@@ -4,6 +4,7 @@ database:
  database: db
  username: username
  password: password
+ enabled: false
 
 rewards:
    1: "eco give %player% 100"

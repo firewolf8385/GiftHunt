@@ -25,6 +25,7 @@
 package net.jadedmc.gifthunt;
 
 import net.jadedmc.gifthunt.commands.GiftHuntCMD;
+import net.jadedmc.gifthunt.databases.MySQL;
 import net.jadedmc.gifthunt.gifts.GiftManager;
 import net.jadedmc.gifthunt.listeners.*;
 import net.jadedmc.gifthunt.player.GiftPlayerManager;
@@ -38,6 +39,7 @@ public final class GiftHuntPlugin extends JavaPlugin {
     private GiftManager giftManager;
     private GiftPlayerManager giftPlayerManager;
     private HookManager hookManager;
+    private MySQL mySQL;
 
     @Override
     public void onEnable() {
@@ -47,6 +49,15 @@ public final class GiftHuntPlugin extends JavaPlugin {
         hookManager = new HookManager(this);
         giftPlayerManager = new GiftPlayerManager(this);
         giftManager = new GiftManager(this);
+        mySQL = new MySQL(this);
+
+        if(mySQL.isEnabled()) {
+            mySQL.openConnection();
+        }
+        else {
+            getLogger().warning("MySQL is required! Please enable it in config.yml.");
+            getServer().getPluginManager().disablePlugin(this);
+        }
 
         registerListeners();
         getCommand("gifthunt").setExecutor(new GiftHuntCMD());
@@ -72,6 +83,10 @@ public final class GiftHuntPlugin extends JavaPlugin {
 
     public HookManager getHookManager() {
         return this.hookManager;
+    }
+
+    public MySQL getMySQL() {
+        return this.mySQL;
     }
 
     private void registerListeners() {

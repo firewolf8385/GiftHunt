@@ -24,14 +24,42 @@
  */
 package net.jadedmc.gifthunt.player;
 
+import net.jadedmc.gifthunt.GiftHuntPlugin;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.UUID;
 
 public class GiftPlayer {
+    private final GiftHuntPlugin plugin;
     private final Collection<String> foundGifts = new HashSet<>();
+    private final UUID uuid;
+
+    public GiftPlayer(@NotNull final GiftHuntPlugin plugin, @NotNull final Player player) {
+        this.plugin = plugin;
+        this.uuid = player.getUniqueId();
+
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                final PreparedStatement findGifts = plugin.getMySQL().getConnection().prepareStatement("SELECT * FROM gifthunt_gifts WHERE uuid = ?");
+                findGifts.setString(1, this.uuid.toString());
+                final ResultSet results = findGifts.executeQuery();
+
+                while(results.next()) {
+                    this.foundGifts.add(results.getString("location"));
+                }
+            }
+            catch (SQLException exception) {
+                exception.printStackTrace();
+            }
+        });
+    }
 
     public void findGift(@NotNull final Block block) {
         final String giftLocation = block.getWorld().getName() + "," +
@@ -40,6 +68,18 @@ public class GiftPlayer {
                 block.getZ();
 
         this.foundGifts.add(giftLocation);
+
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                final PreparedStatement findGifts = plugin.getMySQL().getConnection().prepareStatement("INSERT INTO gifthunt_gifts (uuid,location) VALUES(?,?)");
+                findGifts.setString(1, this.uuid.toString());
+                findGifts.setString(2, giftLocation);
+                findGifts.executeUpdate();
+            }
+            catch (SQLException exception) {
+                exception.printStackTrace();
+            }
+        });
     }
 
     public int getFoundGifts() {

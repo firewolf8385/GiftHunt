@@ -41,7 +41,7 @@ public class GiftPlayerManager {
     }
 
     public void addPlayer(@NotNull final Player player) {
-        this.players.put(player.getUniqueId(), new GiftPlayer());
+        this.players.put(player.getUniqueId(), new GiftPlayer(plugin, player));
     }
 
     public GiftPlayer getPlayer(@NotNull final Player player) {
